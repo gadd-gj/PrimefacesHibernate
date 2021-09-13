@@ -1,6 +1,5 @@
+package com.mycompany.primehiber.dto;
 
-import com.mycompany.primehiber.dto.LoginDAO;
-import com.mycompany.primehiber.dto.SessionUtil;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.enterprise.context.SessionScoped;
@@ -44,28 +43,29 @@ public class Login implements Serializable {
 
     //validate login
     public String validateUsernamePassword() {
-
+        addMessage(FacesMessage.SEVERITY_INFO, "Datos", "Clave: " + this.user + " Nombre: " + this.pwd );
         boolean valid;
 
-        valid = LoginDAO.validate(user, pwd);
+        valid = LoginDAO.validate(this.user, this.pwd);
 
         if (valid) {
             HttpSession session = SessionUtil.getSession();
             session.setAttribute("name", user);
             return "admin";
         } else {
-            FacesContext.getCurrentInstance().addMessage(
-                    null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN,
-                            "Incorrect Username and Passowrd",
-                            "Please enter correct username and Password"));
+            addMessage(FacesMessage.SEVERITY_ERROR, "Incorrect Username and Passowrd", "Please enter correct username and Password");
             return "login";
         }
+    }
+    
+    public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
+        FacesContext.getCurrentInstance().
+                addMessage(null, new FacesMessage(severity, summary, detail));
     }
 
     //logout event, invalidate session
     public String logout() {
-        HttpSession session = SessionUtils.getSession();
+        HttpSession session = SessionUtil.getSession();
         session.invalidate();
         return "login";
     }
